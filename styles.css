@@ -30,7 +30,7 @@ td, th {
   padding: 4px 16px 4px 0;
 }
 
-tfoot {
+tfoot td {
   font-size: 14px;
   padding-top: 20px;
   color: #666;
@@ -41,7 +41,6 @@ tfoot {
 svg {
   display: block;
   width: 100%;
-  shape-rendering: optimizeSpeed;
 }
 
 .country {

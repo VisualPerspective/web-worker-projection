@@ -2,12 +2,12 @@
 <meta charset="utf-8">
 
 <head>
-<title>WebWorker Projection Test</title>
+<title>WebWorker SVG Projection Test</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-<h1>WebWorker Projection Test</h1>
+<h1>WebWorker SVG Projection Test</h1>
 <div class="left">
   <form id="runBenchmark">
     <fieldset id="fields">
@@ -27,7 +27,7 @@
       </fieldset>
       <fieldset>
         <label>
-          <input type="checkbox" name="useWorker"> Use Worker
+          <input type="checkbox" name="useWorker"> Apply Projection in WebWorker
         </label>
         <p><button id="go">Run</button></p>
       </fieldset>
@@ -41,11 +41,16 @@
         <th>Detail</th>
         <th>Worker</th>
         <th class="number">FPS</th>
-        <th class="number">Main Thread Utilization</th>
+        <th class="number">Main Thread Utilization *</th>
       </tr>
     </thead>
     <tbody id="results">
     </tbody>
+    <tfoot>
+      <td colspan="4">
+        * The percentage of time spent running JS in the main thread. Does not include layout and painting time, which change with detail but not worker usage.
+      </td>
+    </tfoot>
   </table>
 </div>
 <div class="right">

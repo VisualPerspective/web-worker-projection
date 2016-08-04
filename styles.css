@@ -15,8 +15,6 @@ body {
   width: 49%;
 }
 
-form { padding: 4px; }
-
 fieldset {
   border: none;
 }
@@ -29,7 +27,13 @@ label, fieldset {
 
 td, th {
   text-align: left;
-  padding: 4px 12px 4px 4px;
+  padding: 4px 16px 4px 0;
+}
+
+tfoot {
+  font-size: 14px;
+  padding-top: 20px;
+  color: #666;
 }
 
 .number { text-align: right; }

@@ -2,6 +2,7 @@ function benchmark (
   useWorker,
   detail
 ) {
+  document.querySelector('fieldset').disabled = true
   var worker = new Worker('js/worker.js')
 
   d3.selectAll('svg').remove()
@@ -132,6 +133,6 @@ function benchmark (
       '<td class="number">' + mainThreadUtilization.toPrecision(2) + '%</td>' +
     '</tr>'
 
-    console.log(results)
+    document.querySelector('fieldset').disabled = false
   }
 }

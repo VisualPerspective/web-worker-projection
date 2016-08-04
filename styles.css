@@ -43,7 +43,7 @@ svg {
   width: 100%;
 }
 
-.country { fill: #eee; stroke: #fff; stroke-width: 1px; }
-.river { fill: none; stroke: #88f; }
-.lake { fill: #88f; }
+.countries { fill: #eee; stroke: #fff; stroke-width: 1px; }
+.rivers { fill: none; stroke: #88f; }
+.lakes { fill: #88f; }
 .globe { fill: #78a; }

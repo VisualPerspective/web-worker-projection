@@ -17,6 +17,9 @@ function runBenchmark (useWorker, detail, vectors) {
   var startTime, lastTime, mainThreadTime = 0, frames = 0
   var workerProjecting = false, worker
 
+  svg.append("path").datum({ type: "Sphere" })
+    .attr("class", "globe").attr("d", path)
+
   featureNames.forEach(function (name) {
     features[name] = topojson.feature(vectors, vectors.objects[name])
     paths[name] = svg.append("path")
@@ -114,20 +117,17 @@ function runBenchmark (useWorker, detail, vectors) {
 
     return worker
   }
+}
 
-  function initSVG () {
-    d3.selectAll('svg').remove()
+function initSVG () {
+  d3.selectAll('svg').remove()
 
-    var svg = d3.select('.right').append('svg')
-    var size = svg.node().getBoundingClientRect().width
+  var svg = d3.select('.right').append('svg')
+  var size = svg.node().getBoundingClientRect().width
 
-    svg.style('height', height + 'px')
-      .attr('width', size)
-      .attr('height', size)
+  svg.style('height', size + 'px')
+    .attr('width', size)
+    .attr('height', size)
 
-    svg.append("path").datum({ type: "Sphere" })
-      .attr("class", "globe").attr("d", path)
-
-    return svg
-  }
+  return svg
 }

@@ -67,7 +67,9 @@ function benchmark (
         reportResults({
           'totalTime': time - startTime,
           'frames': frames,
-          'mainThreadTime': mainThreadTime
+          'mainThreadTime': mainThreadTime,
+          'useWorker': useWorker,
+          'detail': detail
         })
       }
       else {
@@ -121,6 +123,15 @@ function benchmark (
   })
 
   function reportResults(results) {
+    var fps = results.frames / (results.totalTime / 1000)
+    var mainThreadUtilization = results.mainThreadTime / results.totalTime * 100
+    document.getElementById('results').innerHTML += '<tr>' +
+      '<td>' + results.detail + '</td>' +
+      '<td>' + results.useWorker + '</td>' +
+      '<td class="number">' + fps.toPrecision(3) + '</td>' +
+      '<td class="number">' + mainThreadUtilization.toPrecision(2) + '%</td>' +
+    '</tr>'
+
     console.log(results)
   }
 }

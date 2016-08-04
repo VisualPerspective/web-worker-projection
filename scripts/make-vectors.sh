@@ -22,6 +22,6 @@ if [ ! -f ne_50m_admin_0_countries.zip ]; then
 fi
 unzip -o ne_50m_admin_0_countries.zip
 
-topojson -o ../data/vectors-high.json -- countries=ne_50m_admin_0_countries.shp
-topojson --simplify-proportion 0.5 -o ../data/vectors-medium.json -- countries=ne_50m_admin_0_countries.shp
-topojson --simplify-proportion 0.1 -o ../data/vectors-low.json -- countries=ne_50m_admin_0_countries.shp
+topojson -o ../data/vectors-high.json -- countries=ne_50m_admin_0_countries.shp lakes=ne_50m_lakes.shp rivers=ne_50m_rivers_lake_centerlines_scale_rank.shp
+topojson --simplify-proportion 0.5 -o ../data/vectors-medium.json -- countries=ne_50m_admin_0_countries.shp lakes=ne_50m_lakes.shp rivers=ne_50m_rivers_lake_centerlines_scale_rank.shp
+topojson --simplify-proportion 0.1 -o ../data/vectors-low.json -- countries=ne_50m_admin_0_countries.shp lakes=ne_50m_lakes.shp rivers=ne_50m_rivers_lake_centerlines_scale_rank.shp

@@ -29,7 +29,7 @@
         <label>
           <input type="checkbox" name="useWorker"> Use Worker
         </label>
-        <p><button>Run</button></p>
+        <p><button id="go">Run</button></p>
       </fieldset>
     </fieldset>
   </form>
@@ -61,5 +61,5 @@ form.addEventListener('submit', function (e) {
   e.preventDefault()
 })
 
-benchmark(true, 'low')
+document.getElementById('go').click()
 </script>

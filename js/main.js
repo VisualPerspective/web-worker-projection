@@ -7,7 +7,6 @@ function benchmark (
 
   d3.selectAll('svg').remove()
   var svg = d3.select('.right').append('svg')
-
   var width = svg.node().getBoundingClientRect().width
   var height = width
 
@@ -20,6 +19,9 @@ function benchmark (
   var distance = 2.0
   var projection = satellite(distance, width, height)
   var path = d3.geoPath().projection(projection)
+
+  svg.append("path").datum({ type: "Sphere" })
+    .attr("class", "globe").attr("d", path);
 
   d3.json("data/vectors-" + detail + ".json", function(error, vectors) {
     var countries = topojson.feature(vectors, vectors.objects.countries)

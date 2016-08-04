@@ -8,6 +8,8 @@
 
 <body>
 <h1>WebWorker SVG Projection Test</h1>
+<p>Benchmark to test whether running D3 geo projections in a WebWorker
+is practical and helpful for performance.</p>
 <div class="left">
   <form id="runBenchmark">
     <fieldset id="fields">
@@ -27,7 +29,7 @@
       </fieldset>
       <fieldset>
         <label>
-          <input type="checkbox" name="useWorker"> Apply Projection in WebWorker
+          <input type="checkbox" name="useWorker"> Use WebWorker for projection
         </label>
         <p><button id="go">Run</button></p>
       </fieldset>
@@ -48,7 +50,7 @@
     </tbody>
     <tfoot>
       <td colspan="4">
-        * The percentage of time spent running JS in the main thread. Does not include layout and painting time, which change with detail but not worker usage.
+        * The percentage of time spent running animation JS in the main thread. Does not include layout and painting time, which changes with detail but not with worker usage.
       </td>
     </tfoot>
   </table>

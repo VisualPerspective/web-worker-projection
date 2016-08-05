@@ -76,7 +76,7 @@ export default class Benchmark {
   }
 
   workerlessRender() {
-    this.frames++
+    this.timing.frames++
     this.projection.rotate([this.view.longitude, this.view.latitude, 0])
     this.featureNames.forEach((name) => {
       this.paths[name].attr('d', this.path)
@@ -87,7 +87,7 @@ export default class Benchmark {
 
   workerRender() {
     if (!this.workerProjecting) {
-      this.frames++
+      this.timing.frames++
       this.workerProjecting = true
 
       this.worker.postMessage(['projectPaths', {

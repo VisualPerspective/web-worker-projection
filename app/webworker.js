@@ -1,17 +1,7 @@
-importScripts(
-  '../node_modules/d3-selection/build/d3-selection.js',
-  '../node_modules/d3-dispatch/build/d3-dispatch.js',
-  '../node_modules/d3-array/build/d3-array.js',
-  '../node_modules/d3-collection/build/d3-collection.js',
-  '../node_modules/d3-request/build/d3-request.js',
-  '../node_modules/d3-geo/build/d3-geo.js',
-  '../node_modules/d3-geo-projection/build/d3-geo-projection.js',
-  'satellite.js'
-)
+import { geoPath } from 'd3'
+import { satellite } from 'satellite.js'
 
-var vectors
-var distance = 2.0
-var projection
+var vectors, path, projection
 
 var fns = {
   'setup': function (options) {
@@ -23,7 +13,7 @@ var fns = {
       options.height
     )
 
-    path = d3.geoPath().projection(projection)
+    path = geoPath().projection(projection)
   },
 
   'projectPaths': function (options) {

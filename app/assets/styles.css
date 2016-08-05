@@ -44,6 +44,6 @@ svg {
 }
 
 .countries { fill: #eee; stroke: #fff; stroke-width: 1px; }
-.rivers { fill: none; stroke: #88f; }
+.rivers { fill: none; stroke: #88f; stroke-width: 0.5px }
 .lakes { fill: #88f; }
 .globe { fill: #78a; }

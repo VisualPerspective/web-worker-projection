@@ -1,5 +1,45 @@
+import {
+  select,
+  selectAll,
+  json,
+  geoJson,
+  geoPath
+} from 'd3'
+
+import { feature } from 'topojson'
+
+import { satellite } from './satellite.js'
+
+window.addEventListener('DOMContentLoaded', function () {
+  var form = document.getElementById('runBenchmark')
+  form.addEventListener('submit', function (e) {
+    e.preventDefault()
+    benchmark(
+      this.elements['useWorker'].checked,
+      this.elements['detail'].value
+    )
+
+    document.querySelector('fieldset').disabled = true
+  })
+
+  document.getElementById('go').click()
+})
+
+function reportResults(results) {
+  var fps = results.frames / (results.totalTime / 1000)
+  var mainThreadUtilization = results.mainThreadTime / results.totalTime * 100
+  document.getElementById('results').innerHTML += '<tr>' +
+    '<td>' + results.detail + '</td>' +
+    '<td>' + results.useWorker + '</td>' +
+    '<td class="number">' + fps.toPrecision(3) + '</td>' +
+    '<td class="number">' + mainThreadUtilization.toPrecision(2) + '%</td>' +
+  '</tr>'
+
+  document.querySelector('fieldset').disabled = false
+}
+
 function benchmark (useWorker, detail) {
-  d3.json("data/vectors-" + detail + ".json", function (error, vectors) {
+  json("data/vectors-" + detail + ".json", function (error, vectors) {
     runBenchmark(useWorker, detail, vectors)
   })
 }
@@ -11,7 +51,7 @@ function runBenchmark (useWorker, detail, vectors) {
   var latitude = 0, longitude = 0
   var distance = 2.0
   var projection = satellite(distance, width, height)
-  var path = d3.geoPath().projection(projection)
+  var path = geoPath().projection(projection)
   var featureNames = ['countries', 'rivers', 'lakes']
   var features = {}, paths = {}, projectedPaths = []
   var startTime, lastTime, mainThreadTime = 0, frames = 0
@@ -21,7 +61,7 @@ function runBenchmark (useWorker, detail, vectors) {
     .attr("class", "globe").attr("d", path)
 
   featureNames.forEach(function (name) {
-    features[name] = topojson.feature(vectors, vectors.objects[name])
+    features[name] = feature(vectors, vectors.objects[name])
     paths[name] = svg.append("path")
       .datum(features[name])
       .attr("d", path)
@@ -100,7 +140,7 @@ function runBenchmark (useWorker, detail, vectors) {
       }
     }
 
-    var worker = new Worker('js/worker.js')
+    var worker = new Worker('webworker.js')
 
     worker.onmessage = function (e) {
       var fnName = e.data[0]
@@ -120,9 +160,9 @@ function runBenchmark (useWorker, detail, vectors) {
 }
 
 function initSVG () {
-  d3.selectAll('svg').remove()
+  selectAll('svg').remove()
 
-  var svg = d3.select('.right').append('svg')
+  var svg = select('.right').append('svg')
   var size = svg.node().getBoundingClientRect().width
 
   svg.style('height', size + 'px')

@@ -1,9 +1,11 @@
-function satellite (
+import { geoSatellite } from 'd3-geo-projection'
+
+export function satellite (
   distance,
   width,
   height
 ) {
-  return d3.geoSatellite()
+  return geoSatellite()
     .distance(distance)
     .translate([width / 2, height / 2])
     .scale(width * 0.8)

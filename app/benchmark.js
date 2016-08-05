@@ -10,27 +10,23 @@ import { feature } from 'topojson'
 import { satellite } from './satellite.js'
 
 export default class Benchmark {
-  constructor (useWorker, detail, vectors, reportResults) {
+  constructor (useWorker, useSVG, detail, vectors, reportResults) {
+    this.useSVG = useSVG
     this.useWorker = useWorker
     this.detail = detail
     this.vectors = vectors
     this.reportResults = reportResults
 
-    this.initSVG()
-
     this.view = { latitude: 0, longitude: 0, distance: 2.0 }
     this.timing = { start: 0, last: 0, mainThread: 0, frames: 0 }
 
-    this.projection = satellite(this.view.distance, this.width, this.height)
-    this.path = geoPath().projection(this.projection)
+    this.useSVG ? this.initSVG() : this.initCanvas()
+
     this.featureNames = ['countries', 'rivers', 'lakes']
     this.features = {}
     this.paths = {}
     this.projectedPaths = []
     this.workerProjecting = false
-
-    this.svg.append("path").datum({ type: "Sphere" })
-      .attr("class", "globe").attr("d", this.path)
 
     this.setupFeatures()
     if (this.useWorker) { this.createWorker() }
@@ -40,10 +36,13 @@ export default class Benchmark {
   setupFeatures () {
     this.featureNames.forEach((name) => {
       this.features[name] = feature(this.vectors, this.vectors.objects[name])
-      this.paths[name] = this.svg.append("path")
-        .datum(this.features[name])
-        .attr("d", this.path)
-        .attr("class", name)
+
+      if (this.useSVG) {
+        this.paths[name] = this.svg.append('path')
+          .datum(this.features[name])
+          .attr('d', this.path)
+          .attr('class', name)
+      }
     })
   }
 
@@ -62,12 +61,13 @@ export default class Benchmark {
         'totalTime': time - this.timing.start,
         'frames': this.timing.frames,
         'mainThreadTime': this.timing.mainThread,
+        'method': this.useSVG ? 'svg' : 'canvas',
         'useWorker': this.useWorker,
         'detail': this.detail
       })
     }
     else {
-      this.useWorker ? this.workerRender() : this.workerlessRender()
+      this.continueRender()
     }
 
     if (this.timing.start !== this.timing.last) {
@@ -75,17 +75,26 @@ export default class Benchmark {
     }
   }
 
-  workerlessRender() {
+  continueRender() {
+    if (this.useSVG) {
+      this.useWorker ? this.workerSVG() : this.workerlessSVG()
+    }
+    else {
+      this.useWorker ? this.workerCanvas() : this.workerlessCanvas()
+    }
+  }
+
+  workerlessSVG() {
     this.timing.frames++
     this.projection.rotate([this.view.longitude, this.view.latitude, 0])
     this.featureNames.forEach((name) => {
-      this.paths[name].attr('d', this.path)
+        this.paths[name].attr('d', this.path)
     })
 
     window.requestAnimationFrame(() => { this.render() })
   }
 
-  workerRender() {
+  workerSVG() {
     if (!this.workerProjecting) {
       this.timing.frames++
       this.workerProjecting = true
@@ -103,6 +112,44 @@ export default class Benchmark {
     else {
       setTimeout(() => { this.render() }, 1)
     }
+  }
+
+  workerlessCanvas() {
+    this.timing.frames++
+    this.projection.rotate([this.view.longitude, this.view.latitude, 0])
+
+    let ctx = this.ctx
+    ctx.clearRect(0, 0, this.width, this.height)
+
+    // globe
+    ctx.fillStyle = '#78a'
+    ctx.beginPath()
+    this.path({ type: 'Sphere' })
+    ctx.fill()
+
+    // countries
+    ctx.beginPath()
+    this.path(this.features['countries'])
+    ctx.fillStyle = '#eee'
+    ctx.fill()
+    ctx.lineWidth = 1.0
+    ctx.strokeStyle = '#fff'
+    ctx.stroke()
+
+    // lakes
+    ctx.beginPath()
+    this.path(this.features['lakes'])
+    ctx.fillStyle = '#88f'
+    ctx.fill()
+
+    // rivers
+    ctx.beginPath()
+    this.path(this.features['rivers'])
+    ctx.lineWidth = 0.5
+    ctx.strokeStyle = '#88f'
+    ctx.stroke()
+
+    window.requestAnimationFrame(() => { this.render() })
   }
 
   createWorker() {
@@ -135,16 +182,40 @@ export default class Benchmark {
 
   initSVG () {
     selectAll('svg').remove()
+    selectAll('canvas').remove()
 
     this.svg = select('.right').append('svg')
-    var size = this.svg.node().getBoundingClientRect().width
+    this.width = this.height = this.svg.node().getBoundingClientRect().width
 
-    this.width = size
-    this.height = size
+    this.svg.style('height', this.height + 'px')
+      .attr('width', this.width)
+      .attr('height', this.height)
 
-    this.svg.style('height', size + 'px')
-      .attr('width', size)
-      .attr('height', size)
+    this.projection = satellite(this.view.distance, this.width, this.height)
+    this.path = geoPath().projection(this.projection)
+
+    this.svg.append('path').datum({ type: 'Sphere' })
+      .attr('class', 'globe').attr('d', this.path)
+  }
+
+  initCanvas() {
+    selectAll('svg').remove()
+    selectAll('canvas').remove()
+
+    this.canvas = select('.right').append('canvas')
+    let devicePixelRatio = window.devicePixelRatio || 1
+
+    this.width = this.height =
+      this.canvas.node().getBoundingClientRect().width *
+      devicePixelRatio
+
+    this.canvas.style('height', (this.height / devicePixelRatio) + 'px')
+      .attr('width', this.width)
+      .attr('height', this.height)
+
+    this.ctx = this.canvas.node().getContext('2d')
+    this.projection = satellite(this.view.distance, this.width, this.height)
+    this.path = geoPath().projection(this.projection).context(this.ctx)
   }
 }
 

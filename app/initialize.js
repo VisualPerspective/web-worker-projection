@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', function () {
     e.preventDefault()
     benchmark(
       this.elements['useWorker'].checked,
-      this.elements['detail'].value
+      document.querySelector('input[name="detail"]:checked').value
     )
 
     document.querySelector('fieldset').disabled = true

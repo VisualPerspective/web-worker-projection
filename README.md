@@ -1,5 +1,6 @@
 # WebWorker SVG Projection Test
 
+[![Benchmark](/demo.png?raw=true =100x)](http://k9.github.com/web-worker-projection/)
 [Benchmark](http://k9.github.io/web-worker-projection) of D3 projection in a WebWorker.
 
 While working on a [WebGL Globe Viewer](http://k9.github.io/globe-viewer)

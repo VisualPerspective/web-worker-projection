@@ -4,6 +4,9 @@ body {
   margin: 1rem auto;
 }
 
+h1 img { padding-left: 0.5rem; height: 1.5rem; }
+a { text-decoration: none; }
+
 .left {
   display: inline-block;
   width: 49%;

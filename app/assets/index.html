@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 
 <head>
-<title>WebWorker SVG Projection Test</title>
+<title>WebWorker Projection Test</title>
 <link rel="stylesheet" href="styles.css">
 <script src="vendor.js"></script>
 <script src="app.js"></script>
@@ -10,18 +10,18 @@
 </head>
 
 <body>
-<h1>
-  WebWorker SVG Projection Test
-  <a href="https://github.com/k9/web-worker-projection">
-    <img alt="Source code" src="img/github.svg">
-  </a>
-  <a href="http://www.kwjames.com">
-    <img alt="About" src="img/info-circle.svg">
-  </a>
-</h1>
-<p>Benchmark to test whether running D3 geo projections in a WebWorker
-is practical and helpful for performance.</p>
 <div class="left">
+  <h1>WebWorker Projection Test</h1>
+  <p>
+    <a href="https://github.com/k9/web-worker-projection">
+      <img alt="Source code" src="img/github.svg">
+    </a>
+    <a href="http://www.kwjames.com">
+      <img alt="About" src="img/info-circle.svg">
+    </a>
+  </p>
+  <p>Benchmark to test whether running D3 geo projections in a WebWorker
+  is practical and helpful for performance.</p>
   <form id="runBenchmark">
     <fieldset id="fields">
       <fieldset>
@@ -40,32 +40,42 @@ is practical and helpful for performance.</p>
       </fieldset>
       <fieldset>
         <label>
+          <input type="radio" name="method" value="svg" checked>
+          SVG
+        </label>
+        <label>
+          <input type="radio" name="method" value="canvas">
+          Canvas
+        </label>
+      </fieldset>
+      <fieldset>
+        <label>
           <input type="checkbox" name="useWorker"> Use WebWorker for projection
         </label>
         <p><button id="go">Run</button></p>
       </fieldset>
     </fieldset>
   </form>
-
-  <h3>Results</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Detail</th>
-        <th>Worker</th>
-        <th class="number">FPS</th>
-        <th class="number">Main Thread Usage *</th>
-      </tr>
-    </thead>
-    <tbody id="results">
-    </tbody>
-    <tfoot>
-      <td colspan="4">
-        * The percentage of time spent running animation JS in the main thread. Does not include layout and painting time, which changes with detail but not with worker usage.
-      </td>
-    </tfoot>
-  </table>
 </div>
 <div class="right">
 </div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Detail</th>
+      <th>Method</th>
+      <th>Worker</th>
+      <th class="number">FPS</th>
+      <th class="number">* Main Thread Usage</th>
+    </tr>
+  </thead>
+  <tbody id="results">
+  </tbody>
+  <tfoot>
+    <td colspan="5">
+      * The percentage of time spent running animation JS in the main thread. Does not include layout and painting time, which changes with detail but not with worker usage.
+    </td>
+  </tfoot>
+</table>
 </body>

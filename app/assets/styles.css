@@ -4,7 +4,8 @@ body {
   margin: 1rem auto;
 }
 
-h1 img { padding-left: 0.5rem; height: 1.5rem; }
+h1 { margin-bottom: 0; }
+p img { height: 1.75rem; }
 a { text-decoration: none; }
 
 .left {
@@ -18,20 +19,33 @@ a { text-decoration: none; }
   width: 49%;
 }
 
+input { vertical-align: 1px }
+
 fieldset {
   border: none;
+  padding: 0;
+  margin: 0;
 }
 
-label, fieldset {
+label, fieldset>fieldset {
   display: block;
   padding: 0;
-  margin: 0.5rem 0 0 0;
+  margin: 0.75rem 0 0 0;
+}
+
+table { border-spacing: 0 }
+
+th {
+  width: 20%;
+  border-bottom: 1px solid #000;
 }
 
 td, th {
   text-align: left;
-  padding: 4px 16px 4px 0;
+  padding: 4px 16px 2px 0;
 }
+
+td:last-child, th:last-child { padding-right: 4px }
 
 tfoot td {
   font-size: 14px;
@@ -41,7 +55,7 @@ tfoot td {
 
 .number { text-align: right; }
 
-svg {
+canvas, svg {
   display: block;
   width: 100%;
 }

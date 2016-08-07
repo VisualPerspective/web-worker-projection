@@ -1,13 +1,8 @@
-import {
-  select,
-  selectAll,
-  geoJson,
-  geoPath
-} from 'd3'
-
+import { select, selectAll, geoJson, geoPath } from 'd3'
 import { feature } from 'topojson'
-
-import { satellite } from './satellite.js'
+import { satellite } from 'satellite.js'
+import { PathReader } from 'canvasProxy.js'
+const BUFFER_SIZE = 1000000
 
 export default class Benchmark {
   constructor (useWorker, useSVG, detail, vectors, reportResults) {
@@ -25,7 +20,8 @@ export default class Benchmark {
     this.featureNames = ['countries', 'rivers', 'lakes']
     this.features = {}
     this.paths = {}
-    this.projectedPaths = []
+    this.pathReader
+    this.projectedPaths
     this.workerProjecting = false
 
     this.setupFeatures()
@@ -103,9 +99,11 @@ export default class Benchmark {
         'rotate': [this.view.longitude, this.view.latitude, 0]
       }])
 
-      this.featureNames.forEach((name, i) => {
-        this.paths[name].attr('d', this.projectedPaths[i])
-      })
+      if (this.projectedPaths) {
+        this.featureNames.forEach((name, i) => {
+          this.paths[name].attr('d', this.projectedPaths[i])
+        })
+      }
 
       window.requestAnimationFrame(() => { this.render() })
     }
@@ -121,13 +119,11 @@ export default class Benchmark {
     let ctx = this.ctx
     ctx.clearRect(0, 0, this.width, this.height)
 
-    // globe
     ctx.fillStyle = '#78a'
     ctx.beginPath()
     this.path({ type: 'Sphere' })
     ctx.fill()
 
-    // countries
     ctx.beginPath()
     this.path(this.features['countries'])
     ctx.fillStyle = '#eee'
@@ -136,27 +132,96 @@ export default class Benchmark {
     ctx.strokeStyle = '#fff'
     ctx.stroke()
 
-    // lakes
-    ctx.beginPath()
-    this.path(this.features['lakes'])
-    ctx.fillStyle = '#88f'
-    ctx.fill()
-
-    // rivers
     ctx.beginPath()
     this.path(this.features['rivers'])
     ctx.lineWidth = 0.5
     ctx.strokeStyle = '#88f'
     ctx.stroke()
 
+    ctx.beginPath()
+    this.path(this.features['lakes'])
+    ctx.fillStyle = '#88f'
+    ctx.fill()
+
     window.requestAnimationFrame(() => { this.render() })
+  }
+
+  workerCanvas() {
+    if (!this.pathReader) {
+      this.pathReader = new PathReader(
+        new Uint8Array(BUFFER_SIZE),
+        new Float64Array(BUFFER_SIZE),
+        []
+      )
+
+      this.requestCanvasPaths()
+
+      window.requestAnimationFrame(() => { this.render() })
+    }
+    else if (!this.workerProjecting) {
+      this.timing.frames++
+      let ctx = this.ctx
+
+      ctx.clearRect(0, 0, this.width, this.height)
+
+      ctx.fillStyle = '#78a'
+      ctx.beginPath()
+      this.path({ type: 'Sphere' })
+      ctx.fill()
+
+      ctx.beginPath()
+      this.pathReader.renderPath(ctx)
+      ctx.fillStyle = '#eee'
+      ctx.fill()
+      ctx.lineWidth = 1.0
+      ctx.strokeStyle = '#fff'
+      ctx.stroke()
+
+      ctx.beginPath()
+      this.pathReader.renderPath(ctx)
+      ctx.lineWidth = 0.5
+      ctx.strokeStyle = '#88f'
+      ctx.stroke()
+
+      ctx.beginPath()
+      this.pathReader.renderPath(ctx)
+      ctx.fillStyle = '#88f'
+      ctx.fill()
+
+      this.requestCanvasPaths()
+      window.requestAnimationFrame(() => { this.render() })
+    }
+    else {
+      setTimeout(() => { this.render() }, 1)
+    }
+  }
+
+  requestCanvasPaths() {
+    this.workerProjecting = true
+
+    this.worker.postMessage(['projectPaths', {
+      'rotate': [this.view.longitude, this.view.latitude, 0],
+      'commandArray': this.pathReader.commandArray,
+      'argumentArray': this.pathReader.argumentArray
+    }], [
+      this.pathReader.commandArray.buffer,
+      this.pathReader.argumentArray.buffer
+    ])
   }
 
   createWorker() {
     var fns = {
       'pathsProjected': (options) => {
-        this.workerProjecting = false
         this.projectedPaths = options.paths
+        this.workerProjecting = false
+
+        if (!this.useSVG) {
+          this.pathReader = new PathReader(
+            options.commandArray,
+            options.argumentArray,
+            options.endOfPaths
+          )
+        }
       }
     }
 
@@ -176,11 +241,12 @@ export default class Benchmark {
       ],
       distance: this.view.distance,
       width: this.width,
-      height: this.height
+      height: this.height,
+      useSVG: this.useSVG
     }])
   }
 
-  initSVG () {
+  initSVG() {
     selectAll('svg').remove()
     selectAll('canvas').remove()
 

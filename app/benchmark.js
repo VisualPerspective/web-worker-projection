@@ -2,7 +2,11 @@ import { select, selectAll, geoJson, geoPath } from 'd3'
 import { feature } from 'topojson'
 import { satellite } from 'satellite.js'
 import { PathReader } from 'canvasProxy.js'
-const BUFFER_SIZE = 1000000
+
+import * as WorkerlessSVG from 'renderers/workerlessSVG.js'
+import * as WorkerSVG from 'renderers/workerSVG.js'
+import * as WorkerlessCanvas from 'renderers/workerlessCanvas.js'
+import * as WorkerCanvas from 'renderers/workerCanvas.js'
 
 export default class Benchmark {
   constructor (useWorker, useSVG, detail, vectors, reportResults) {
@@ -16,6 +20,7 @@ export default class Benchmark {
     this.timing = { start: 0, last: 0, mainThread: 0, frames: 0 }
 
     this.useSVG ? this.initSVG() : this.initCanvas()
+    this.renderPaths = this.choosePathRenderer().renderPaths
 
     this.featureNames = ['countries', 'rivers', 'lakes']
     this.features = {}
@@ -29,9 +34,17 @@ export default class Benchmark {
     this.render()
   }
 
+  choosePathRenderer() {
+    return this.useSVG ?
+      (this.useWorker ? WorkerSVG : WorkerlessSVG) :
+      (this.useWorker ? WorkerCanvas : WorkerlessCanvas)
+  }
+
   setupFeatures () {
     this.featureNames.forEach((name) => {
-      this.features[name] = feature(this.vectors, this.vectors.objects[name])
+      this.features[name] = feature(
+        this.vectors, this.vectors.objects[name]
+      )
 
       if (this.useSVG) {
         this.paths[name] = this.svg.append('path')
@@ -63,150 +76,12 @@ export default class Benchmark {
       })
     }
     else {
-      this.continueRender()
+      this.renderPaths(this)
     }
 
     if (this.timing.start !== this.timing.last) {
       this.timing.mainThread += (window.performance.now() - time)
     }
-  }
-
-  continueRender() {
-    if (this.useSVG) {
-      this.useWorker ? this.workerSVG() : this.workerlessSVG()
-    }
-    else {
-      this.useWorker ? this.workerCanvas() : this.workerlessCanvas()
-    }
-  }
-
-  workerlessSVG() {
-    this.timing.frames++
-    this.projection.rotate([this.view.longitude, this.view.latitude, 0])
-    this.featureNames.forEach((name) => {
-        this.paths[name].attr('d', this.path)
-    })
-
-    window.requestAnimationFrame(() => { this.render() })
-  }
-
-  workerSVG() {
-    if (!this.workerProjecting) {
-      this.timing.frames++
-      this.workerProjecting = true
-
-      this.worker.postMessage(['projectPaths', {
-        'rotate': [this.view.longitude, this.view.latitude, 0]
-      }])
-
-      if (this.projectedPaths) {
-        this.featureNames.forEach((name, i) => {
-          this.paths[name].attr('d', this.projectedPaths[i])
-        })
-      }
-
-      window.requestAnimationFrame(() => { this.render() })
-    }
-    else {
-      setTimeout(() => { this.render() }, 1)
-    }
-  }
-
-  workerlessCanvas() {
-    this.timing.frames++
-    this.projection.rotate([this.view.longitude, this.view.latitude, 0])
-
-    let ctx = this.ctx
-    ctx.clearRect(0, 0, this.width, this.height)
-
-    ctx.fillStyle = '#78a'
-    ctx.beginPath()
-    this.path({ type: 'Sphere' })
-    ctx.fill()
-
-    ctx.beginPath()
-    this.path(this.features['countries'])
-    ctx.fillStyle = '#eee'
-    ctx.fill()
-    ctx.lineWidth = 1.0
-    ctx.strokeStyle = '#fff'
-    ctx.stroke()
-
-    ctx.beginPath()
-    this.path(this.features['rivers'])
-    ctx.lineWidth = 0.5
-    ctx.strokeStyle = '#88f'
-    ctx.stroke()
-
-    ctx.beginPath()
-    this.path(this.features['lakes'])
-    ctx.fillStyle = '#88f'
-    ctx.fill()
-
-    window.requestAnimationFrame(() => { this.render() })
-  }
-
-  workerCanvas() {
-    if (!this.pathReader) {
-      this.pathReader = new PathReader(
-        new Uint8Array(BUFFER_SIZE),
-        new Float64Array(BUFFER_SIZE),
-        []
-      )
-
-      this.requestCanvasPaths()
-
-      window.requestAnimationFrame(() => { this.render() })
-    }
-    else if (!this.workerProjecting) {
-      this.timing.frames++
-      let ctx = this.ctx
-
-      ctx.clearRect(0, 0, this.width, this.height)
-
-      ctx.fillStyle = '#78a'
-      ctx.beginPath()
-      this.path({ type: 'Sphere' })
-      ctx.fill()
-
-      ctx.beginPath()
-      this.pathReader.renderPath(ctx)
-      ctx.fillStyle = '#eee'
-      ctx.fill()
-      ctx.lineWidth = 1.0
-      ctx.strokeStyle = '#fff'
-      ctx.stroke()
-
-      ctx.beginPath()
-      this.pathReader.renderPath(ctx)
-      ctx.lineWidth = 0.5
-      ctx.strokeStyle = '#88f'
-      ctx.stroke()
-
-      ctx.beginPath()
-      this.pathReader.renderPath(ctx)
-      ctx.fillStyle = '#88f'
-      ctx.fill()
-
-      this.requestCanvasPaths()
-      window.requestAnimationFrame(() => { this.render() })
-    }
-    else {
-      setTimeout(() => { this.render() }, 1)
-    }
-  }
-
-  requestCanvasPaths() {
-    this.workerProjecting = true
-
-    this.worker.postMessage(['projectPaths', {
-      'rotate': [this.view.longitude, this.view.latitude, 0],
-      'commandArray': this.pathReader.commandArray,
-      'argumentArray': this.pathReader.argumentArray
-    }], [
-      this.pathReader.commandArray.buffer,
-      this.pathReader.argumentArray.buffer
-    ])
   }
 
   createWorker() {

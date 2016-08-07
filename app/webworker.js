@@ -1,11 +1,14 @@
 import { geoPath } from 'd3'
 import { satellite } from 'satellite.js'
+import { PathWriter } from 'canvasProxy.js'
 
-var vectors, path, projection
+let vectors, path, projection, useSVG
+let commands = [], args = []
 
-var fns = {
+let fns = {
   'setup': function (options) {
     vectors = options.vectors
+    useSVG = options.useSVG
 
     projection = satellite(
       options.distance,
@@ -19,12 +22,36 @@ var fns = {
   'projectPaths': function (options) {
     projection.rotate(options.rotate)
 
-    var results = []
-    for (var i = 0; i < vectors.length; i++) {
-      results.push(path(vectors[i]))
+    if (useSVG) {
+      var results = []
+      for (let vector of vectors) {
+        results.push(path(vector))
+      }
+
+      postMessage(['pathsProjected', { paths: results }])
+    }
+    else {
+      let proxy = new PathWriter(
+        options.commandArray,
+        options.argumentArray
+      )
+
+      path.context(proxy)
+
+      for (let vector of vectors) {
+        path(vector)
+        proxy.markEndOfPath()
+      }
+
+      postMessage(['pathsProjected', {
+          commandArray: proxy.commandArray,
+          argumentArray: proxy.argumentArray,
+          endOfPaths: proxy.endOfPaths
+        }],
+        [options.commandArray.buffer, options.argumentArray.buffer]
+      )
     }
 
-    postMessage(['pathsProjected', { paths: results }])
   }
 }
 

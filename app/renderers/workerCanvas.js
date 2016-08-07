@@ -14,7 +14,7 @@ export function renderPaths (world) {
     window.requestAnimationFrame(() => { world.render() })
   }
   else if (!world.workerProjecting) {
-    world.timing.frames++
+    world.animation.frames++
     let ctx = world.ctx
 
     ctx.clearRect(0, 0, world.width, world.height)

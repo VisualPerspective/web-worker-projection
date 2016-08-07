@@ -1,5 +1,5 @@
 export function renderPaths (world) {
-  world.timing.frames++
+  world.animation.frames++
   world.projection.rotate([world.view.longitude, world.view.latitude, 0])
 
   let ctx = world.ctx

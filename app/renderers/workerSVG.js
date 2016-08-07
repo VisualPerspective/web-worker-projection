@@ -1,6 +1,6 @@
 export function renderPaths (world) {
   if (!world.workerProjecting) {
-    world.timing.frames++
+    world.animation.frames++
     world.workerProjecting = true
 
     world.worker.postMessage(['projectPaths', {

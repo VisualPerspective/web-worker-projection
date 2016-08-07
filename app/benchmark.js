@@ -1,7 +1,10 @@
 import { select, selectAll, geoJson, geoPath } from 'd3'
 import { feature } from 'topojson'
 import { satellite } from 'satellite.js'
+import { createWorker } from 'workerClient.js'
+
 import { PathReader } from 'canvasProxy.js'
+import { Animation } from 'animation.js'
 
 import * as WorkerlessSVG from 'renderers/workerlessSVG.js'
 import * as WorkerSVG from 'renderers/workerSVG.js'
@@ -16,8 +19,8 @@ export default class Benchmark {
     this.vectors = vectors
     this.reportResults = reportResults
 
-    this.view = { latitude: 0, longitude: 0, distance: 2.0 }
-    this.timing = { start: 0, last: 0, mainThread: 0, frames: 0 }
+    this.view = { latitude: 0, longitude: 0, distance: 3.0 }
+    this.animation = new Animation()
 
     this.useSVG ? this.initSVG() : this.initCanvas()
     this.renderPaths = this.choosePathRenderer().renderPaths
@@ -30,7 +33,7 @@ export default class Benchmark {
     this.workerProjecting = false
 
     this.setupFeatures()
-    if (this.useWorker) { this.createWorker() }
+    if (this.useWorker) { this.worker = createWorker(this) }
     this.render()
   }
 
@@ -56,69 +59,24 @@ export default class Benchmark {
   }
 
   render () {
-    var time = window.performance.now()
-    if (!this.timing.start) {
-      this.timing.start = this.timing.last = time
-    }
-    else {
-      this.view.longitude += (time - this.timing.last) / 20
-      this.timing.last = time
-    }
-
-    if ((time - this.timing.start) > 5000) {
-      this.reportResults({
-        'totalTime': time - this.timing.start,
-        'frames': this.timing.frames,
-        'mainThreadTime': this.timing.mainThread,
-        'method': this.useSVG ? 'svg' : 'canvas',
-        'useWorker': this.useWorker,
-        'detail': this.detail
-      })
-    }
-    else {
-      this.renderPaths(this)
-    }
-
-    if (this.timing.start !== this.timing.last) {
-      this.timing.mainThread += (window.performance.now() - time)
-    }
-  }
-
-  createWorker() {
-    var fns = {
-      'pathsProjected': (options) => {
-        this.projectedPaths = options.paths
-        this.workerProjecting = false
-
-        if (!this.useSVG) {
-          this.pathReader = new PathReader(
-            options.commandArray,
-            options.argumentArray,
-            options.endOfPaths
-          )
-        }
+    this.animation.tick((elapsed) => {
+      this.view.longitude += elapsed / 20
+    },
+    (totalElapsed) => {
+      if (totalElapsed > 5000) {
+        this.reportResults({
+          'totalTime': totalElapsed,
+          'frames': this.animation.frames,
+          'mainThreadTime': this.animation.mainThread,
+          'method': this.useSVG ? 'svg' : 'canvas',
+          'useWorker': this.useWorker,
+          'detail': this.detail
+        })
       }
-    }
-
-    this.worker = new Worker('webworker.js')
-
-    this.worker.onmessage = (e) => {
-      var fnName = e.data[0]
-      var options = e.data[1]
-      fns[fnName](options)
-    }
-
-    this.worker.postMessage(['setup', {
-      vectors: [
-        this.features['countries'],
-        this.features['rivers'],
-        this.features['lakes']
-      ],
-      distance: this.view.distance,
-      width: this.width,
-      height: this.height,
-      useSVG: this.useSVG
-    }])
+      else {
+        this.renderPaths(this)
+      }
+    })
   }
 
   initSVG() {

@@ -24,31 +24,31 @@ let fns = {
 
     if (useSVG) {
       var results = []
-      for (let vector of vectors) {
-        results.push(path(vector))
+      for (let i = 0; i < vectors.length; i++) {
+        results.push(path(vectors[i]))
       }
 
       postMessage(['pathsProjected', { paths: results }])
     }
     else {
       let proxy = new PathWriter(
-        options.commandArray,
-        options.argumentArray
+        options.commandBuffer,
+        options.argumentBuffer
       )
 
       path.context(proxy)
 
-      for (let vector of vectors) {
-        path(vector)
+      for (let i = 0; i < vectors.length; i++) {
+        path(vectors[i])
         proxy.markEndOfPath()
       }
 
       postMessage(['pathsProjected', {
-          commandArray: proxy.commandArray,
-          argumentArray: proxy.argumentArray,
+          commandBuffer: proxy.commandArray.buffer,
+          argumentBuffer: proxy.argumentArray.buffer,
           endOfPaths: proxy.endOfPaths
         }],
-        [options.commandArray.buffer, options.argumentArray.buffer]
+        [proxy.commandArray.buffer, proxy.argumentArray.buffer]
       )
     }
 

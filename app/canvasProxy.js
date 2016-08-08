@@ -3,10 +3,15 @@ export const LINE_TO = 1
 export const ARC = 2
 export const CLOSE_PATH = 3
 
+// This can't be very large in Firefox due to:
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1240984
+const BUFFER_SIZE = 100000
+const MAX_ARGUMENTS = 5
+
 export class PathWriter {
-  constructor(commandArray, argumentArray) {
-    this.commandArray = commandArray
-    this.argumentArray = argumentArray
+  constructor(commandBuffer, argumentBuffer) {
+    this.commandArray = new Uint8Array(commandBuffer || BUFFER_SIZE)
+    this.argumentArray = new Float64Array(argumentBuffer || (BUFFER_SIZE * MAX_ARGUMENTS))
     this.commandIndex = 0
     this.argumentIndex = 0
     this.endOfPaths = []
@@ -43,12 +48,12 @@ export class PathWriter {
 }
 
 export class PathReader {
-  constructor(commandArray, argumentArray, endOfPaths) {
-    this.commandArray = commandArray
-    this.argumentArray = argumentArray
+  constructor(commandBuffer, argumentBuffer, endOfPaths) {
+    this.commandArray = new Uint8Array(commandBuffer || BUFFER_SIZE)
+    this.argumentArray = new Float64Array(argumentBuffer || BUFFER_SIZE)
+    this.endOfPaths = endOfPaths || []
     this.commandIndex = 0
     this.argumentIndex = 0
-    this.endOfPaths = endOfPaths
   }
 
   renderPath(ctx) {

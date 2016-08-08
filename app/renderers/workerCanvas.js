@@ -1,19 +1,17 @@
 import { PathReader } from '../canvasProxy.js'
 
-const BUFFER_SIZE = 1000000
-
 export function renderPaths (world) {
   if (!world.pathReader) {
-    world.pathReader = new PathReader(
-      new Uint8Array(BUFFER_SIZE),
-      new Float64Array(BUFFER_SIZE),
-      []
-    )
+    world.pathReader = {
+      front: new PathReader(),
+      back: new PathReader()
+    }
 
     requestCanvasPaths(world)
     window.requestAnimationFrame(() => { world.render() })
   }
   else if (!world.workerProjecting) {
+    requestCanvasPaths(world)
     world.animation.frames++
     let ctx = world.ctx
 
@@ -23,27 +21,29 @@ export function renderPaths (world) {
     ctx.beginPath()
     world.path({ type: 'Sphere' })
     ctx.fill()
+    ctx.lineWidth = 1.0
+    ctx.strokeStyle = '#457'
+    ctx.stroke()
 
     ctx.beginPath()
-    world.pathReader.renderPath(ctx)
+    world.pathReader.front.renderPath(ctx)
     ctx.fillStyle = '#eee'
     ctx.fill()
     ctx.lineWidth = 1.0
-    ctx.strokeStyle = '#fff'
+    ctx.strokeStyle = '#457'
     ctx.stroke()
 
     ctx.beginPath()
-    world.pathReader.renderPath(ctx)
+    world.pathReader.front.renderPath(ctx)
     ctx.lineWidth = 0.5
-    ctx.strokeStyle = '#88f'
+    ctx.strokeStyle = '#78a'
     ctx.stroke()
 
     ctx.beginPath()
-    world.pathReader.renderPath(ctx)
-    ctx.fillStyle = '#88f'
+    world.pathReader.front.renderPath(ctx)
+    ctx.fillStyle = '#78a'
     ctx.fill()
 
-    requestCanvasPaths(world)
     window.requestAnimationFrame(() => { world.render() })
   }
   else {
@@ -57,10 +57,10 @@ function requestCanvasPaths (world) {
 
   world.worker.postMessage(['projectPaths', {
     'rotate': [world.view.longitude, world.view.latitude, 0],
-    'commandArray': world.pathReader.commandArray,
-    'argumentArray': world.pathReader.argumentArray
+    'commandBuffer': world.pathReader.back.commandArray.buffer,
+    'argumentBuffer': world.pathReader.back.argumentArray.buffer
   }], [
-    world.pathReader.commandArray.buffer,
-    world.pathReader.argumentArray.buffer
+    world.pathReader.back.commandArray.buffer,
+    world.pathReader.back.argumentArray.buffer
   ])
 }

@@ -9,24 +9,27 @@ export function renderPaths (world) {
   ctx.beginPath()
   world.path({ type: 'Sphere' })
   ctx.fill()
+  ctx.lineWidth = 1.0
+  ctx.strokeStyle = '#457'
+  ctx.stroke()
 
   ctx.beginPath()
   world.path(world.features['countries'])
   ctx.fillStyle = '#eee'
   ctx.fill()
   ctx.lineWidth = 1.0
-  ctx.strokeStyle = '#fff'
+  ctx.strokeStyle = '#457'
   ctx.stroke()
 
   ctx.beginPath()
   world.path(world.features['rivers'])
   ctx.lineWidth = 0.5
-  ctx.strokeStyle = '#88f'
+  ctx.strokeStyle = '#78a'
   ctx.stroke()
 
   ctx.beginPath()
   world.path(world.features['lakes'])
-  ctx.fillStyle = '#88f'
+  ctx.fillStyle = '#78a'
   ctx.fill()
 
   window.requestAnimationFrame(() => { world.render() })

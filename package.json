@@ -12,6 +12,8 @@
     "prod": "brunch build --production"
   },
   "dependencies": {
+    "babel-plugin-transform-es2015-for-of": "^6.8.0",
+    "babel-plugin-transform-object-assign": "^6.8.0",
     "d3": "^4.2.1",
     "topojson": "^1.6.26"
   },

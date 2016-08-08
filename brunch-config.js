@@ -15,7 +15,13 @@ module.exports = {
   },
 
   plugins: {
-    babel: { presets: ['es2015'] }
+    babel: {
+      presets: ['es2015'],
+      plugins: [
+        'transform-object-assign',
+        'transform-es2015-for-of'
+      ]
+    }
   },
 
   hooks: {
@@ -32,5 +38,9 @@ module.exports = {
         }
       }
     }
+  },
+
+  server: {
+    hostname: '0.0.0.0'
   }
 };

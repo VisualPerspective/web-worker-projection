@@ -9,9 +9,10 @@ export function createWorker (world) {
         world.projectedPaths = options.paths
       }
       else {
-        world.pathReader = new PathReader(
-          options.commandArray,
-          options.argumentArray,
+        world.pathReader.back = world.pathReader.front
+        world.pathReader.front = new PathReader(
+          options.commandBuffer,
+          options.argumentBuffer,
           options.endOfPaths
         )
       }

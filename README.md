@@ -1,7 +1,7 @@
-# WebWorker SVG Projection Test
+# WebWorker Geo Projection Test
 
-[![Benchmark](/demo.png?raw=true =100x)](http://k9.github.com/web-worker-projection/)
-[Benchmark](http://k9.github.io/web-worker-projection) of D3 projection in a WebWorker.
+[![Test](/demo.png?raw=true =100x)](http://k9.github.com/web-worker-projection/)
+[Test](http://k9.github.io/web-worker-projection) of D3 projection in a WebWorker.
 
 While working on a [WebGL Globe Viewer](http://k9.github.io/globe-viewer)
 I wanted to add interactivity
@@ -18,8 +18,3 @@ success: while it doesn't increase frame rate, it does leave a lot of room for
 other processing on the main thread. I'm still not sure if I'll integrate
 this approach, or go with another method, but it's promising.
 
-**Note:** actually spinning the globe as in the benchmark could be handled
-using [interpolation](https://bl.ocks.org/mbostock/4183330) and transitions, which would give better performance.
-But I want the globe to track the user's cursor without latency, and syncing WebGL
-state with D3 transitions seems difficult, which is why I'm testing a brute-force
-approach.

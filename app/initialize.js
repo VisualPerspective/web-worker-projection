@@ -18,7 +18,11 @@ window.addEventListener('DOMContentLoaded', function () {
   document.getElementById('go').click()
 })
 
-function reportResults(results) {
+function reportInvalid () {
+  document.querySelector('fieldset').disabled = false
+}
+
+function reportResults (results) {
   var fps = results.frames / (results.totalTime / 1000)
   var mainThreadUtilization = results.mainThreadTime / results.totalTime * 100
   document.getElementById('results').innerHTML += '<tr>' +
@@ -34,7 +38,10 @@ function reportResults(results) {
 
 function benchmark (useWorker, useSVG, detail) {
   json("data/vectors-" + detail + ".json", function (error, vectors) {
-     new Benchmark(useWorker, useSVG, detail, vectors, reportResults)
+     new Benchmark(
+      useWorker, useSVG, detail, vectors,
+      reportResults, reportInvalid
+    )
   })
 }
 

@@ -12,18 +12,25 @@ import * as WorkerlessCanvas from 'renderers/workerlessCanvas.js'
 import * as WorkerCanvas from 'renderers/workerCanvas.js'
 
 export default class Benchmark {
-  constructor (useWorker, useSVG, detail, vectors, reportResults) {
+  constructor (useWorker, useSVG, detail, vectors, reportResults, reportInvalid) {
     this.useSVG = useSVG
     this.useWorker = useWorker
     this.detail = detail
     this.vectors = vectors
     this.reportResults = reportResults
+    this.reportInvalid = reportInvalid
 
     this.view = { latitude: 0, longitude: 0, distance: 3.0 }
     this.animation = new Animation()
 
     this.useSVG ? this.initSVG() : this.initCanvas()
     this.renderPaths = this.choosePathRenderer().renderPaths
+
+    // just abandon test on resize
+    window.addEventListener('resize', () => {
+      document.querySelector('canvas, svg').style.display = 'none'
+      this.invalid = true
+    })
 
     this.featureNames = ['countries', 'rivers', 'lakes']
     this.features = {}
@@ -63,7 +70,10 @@ export default class Benchmark {
       this.view.longitude += elapsed / 20
     },
     (totalElapsed) => {
-      if (totalElapsed > 5000) {
+      if (this.invalid) {
+        this.reportInvalid()
+      }
+      else if (totalElapsed > 5000) {
         this.reportResults({
           'totalTime': totalElapsed,
           'frames': this.animation.frames,

@@ -20,8 +20,8 @@
       <img alt="About" src="img/info-circle.svg">
     </a>
   </p>
-  <p>Benchmark to test whether running D3 geo projections in a WebWorker
-  is practical and helpful for performance.</p>
+  <p>A test of whether running D3 geo projections in a
+  WebWorker is practical and helpful for performance.</p>
   <form id="runBenchmark">
     <fieldset id="fields">
       <fieldset>
@@ -67,14 +67,14 @@
       <th>Method</th>
       <th>Worker</th>
       <th class="number">FPS</th>
-      <th class="number">Main Thread Usage *</th>
+      <th class="number">Main Thread Render *</th>
     </tr>
   </thead>
   <tbody id="results">
   </tbody>
   <tfoot>
     <td colspan="5">
-      * The percentage of time spent running animation JS in the main thread. Does not include layout and painting time, which changes with detail but not with worker usage.
+      * The percentage of time spent handling requestAnimationFrame
     </td>
   </tfoot>
 </table>

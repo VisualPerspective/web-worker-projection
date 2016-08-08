@@ -10,6 +10,7 @@
 </head>
 
 <body>
+<div>
 <div class="left">
   <h1>WebWorker Projection Test</h1>
   <p>
@@ -59,6 +60,7 @@
 </div>
 <div class="right">
 </div>
+</div>
 
 <table>
   <thead>
@@ -67,15 +69,17 @@
       <th>Method</th>
       <th>Worker</th>
       <th class="number">FPS</th>
-      <th class="number">Render *</th>
+      <th class="number">Render Time *</th>
     </tr>
   </thead>
   <tbody id="results">
   </tbody>
   <tfoot>
-    <td colspan="5">
-      * The percentage of time spent handling requestAnimationFrame
-    </td>
+    <tr>
+      <td colspan="5">
+        * The percentage of time spent handling requestAnimationFrame
+      </td>
+    </tr>
   </tfoot>
 </table>
 </body>

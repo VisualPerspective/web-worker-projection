@@ -4,21 +4,26 @@ body {
   margin: 1rem auto;
 }
 
+@media (max-width: 63rem) {
+  body { padding: 0 1.5rem; }
+}
+
+@media (min-width: 45rem) {
+  .left {
+    display: inline-block;
+    width: 49%;
+    vertical-align: top;
+  }
+
+  .right {
+    display: inline-block;
+    width: 49%;
+  }
+}
+
 h1 { margin-bottom: 0; }
 p img { height: 1.75rem; }
 a { text-decoration: none; }
-
-.left {
-  display: inline-block;
-  width: 49%;
-  vertical-align: top;
-}
-
-.right {
-  display: inline-block;
-  width: 49%;
-}
-
 input { vertical-align: 1px }
 
 fieldset {
@@ -33,7 +38,10 @@ label, fieldset>fieldset {
   margin: 0.75rem 0 0 0;
 }
 
-table { border-spacing: 0 }
+table {
+  border-spacing: 0;
+  width: 100%;
+}
 
 th {
   width: 20%;

@@ -20,6 +20,7 @@ https://github.com/k9/web-worker-projection/blob/master/app/webworker.js
 For Canvas, a simple proxy is used to record canvas operations in the
 WebWorker, so they can be played back on the main thread:
 https://github.com/k9/web-worker-projection/blob/master/app/canvasProxy.js
+(based on a method from https://blog.mozilla.org/research/2014/07/22/webgl-in-web-workers-today-and-faster-than-expected/)
 
 In my testing results are mixed:
 

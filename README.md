@@ -13,7 +13,15 @@ WebGL and D3 both require significant time on the main browser thread,
 so [frame rate declines](http://k9.github.io/globe-viewer-svg-test).
 
 So this is an experiment in moving D3 projection math into a WebWorker,
-with the goal of reducing processing on the main thread. Results are mixed:
+with the goal of reducing processing on the main thread. For SVG, this
+means computing "path" strings in the WebWorker and passing them back:
+https://github.com/k9/web-worker-projection/blob/master/app/webworker.js
+
+For Canvas, a simple proxy is used to record canvas operations in the
+WebWorker, so they can be played back on the main thread:
+https://github.com/k9/web-worker-projection/blob/master/app/canvasProxy.js
+
+In my testing results are mixed:
 
 Positives:
 * A lot of processing is successfully moved off the main thread

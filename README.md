@@ -13,8 +13,13 @@ WebGL and D3 both require significant time on the main browser thread,
 so [frame rate declines](http://k9.github.io/globe-viewer-svg-test).
 
 So this is an experiment in moving D3 projection math into a WebWorker,
-with the goal of reducing processing on the main thread. Overall it's a
-success: while it doesn't increase frame rate, it does leave a lot of room for
-other processing on the main thread. I'm still not sure if I'll integrate
-this approach, or go with another method, but it's promising.
+with the goal of reducing processing on the main thread. Results are mixed:
 
+Positives:
+* A lot of processing is successfully moved off the main thread
+* FPS on phones is significantly better
+
+Negatives:
+* FPS does not increase in most cases
+* Firefox doesn't perform well due to https://bugzilla.mozilla.org/show_bug.cgi?id=1240984
+* Overall the code becomes more complex

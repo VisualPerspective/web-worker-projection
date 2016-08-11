@@ -1,23 +1,26 @@
-import { createWorker } from 'workerClient.js'
+import { WorkerClient } from 'workerClient.js'
 
-export function renderPaths (world) {
-  if (!world.workerProjecting) {
-    world.animation.frames++
-    world.workerProjecting = true
-
-    world.worker.postMessage(['projectPaths', {
-      'rotate': [world.view.longitude, world.view.latitude, 0]
-    }])
-
-    if (world.projectedPaths) {
-      world.featureNames.forEach((name, i) => {
-        world.paths[name].attr('d', world.projectedPaths[i])
-      })
-    }
-
-    window.requestAnimationFrame(() => { world.render() })
+export class WorkerSVG {
+  constructor (world) {
+    this.world = world
+    this.workerClient = new WorkerClient(this.world)
   }
-  else {
-    setTimeout(() => { world.render() }, 1)
+
+  renderPaths () {
+    if (!this.workerClient.projecting) {
+      this.world.animation.frames++
+      this.workerClient.requestSVGPaths()
+
+      if (this.workerClient.projectedPaths) {
+        this.world.featureNames.forEach((name, i) => {
+          this.world.paths[name].attr('d', this.workerClient.projectedPaths[i])
+        })
+      }
+
+      window.requestAnimationFrame(() => { this.world.render() })
+    }
+    else {
+      setTimeout(() => { this.world.render() }, 1)
+    }
   }
 }

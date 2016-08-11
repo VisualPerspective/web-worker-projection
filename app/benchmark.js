@@ -25,12 +25,12 @@ export default class Benchmark {
     this.pathReader
     this.projectedPaths
 
+    this.view = { latitude: 0, longitude: 0, distance: 3.0 }
+    this.useSVG ? this.initSVG() : this.initCanvas()
     this.setupFeatures()
 
-    this.view = { latitude: 0, longitude: 0, distance: 3.0 }
     this.animation = new Animation()
 
-    this.useSVG ? this.initSVG() : this.initCanvas()
     this.renderer = this.choosePathRenderer()
 
     // just abandon test on resize

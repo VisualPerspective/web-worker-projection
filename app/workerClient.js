@@ -60,4 +60,12 @@ export class WorkerClient {
       this.pathReader.back.argumentArray.buffer
     ])
   }
+
+  requestSVGPaths () {
+    this.projecting = true
+
+    this.worker.postMessage(['projectPaths', {
+      'rotate': [this.world.view.longitude, this.world.view.latitude, 0]
+    }])
+  }
 }

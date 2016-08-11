@@ -11,8 +11,8 @@ import { WorkerlessCanvas } from 'renderers/workerlessCanvas.js'
 import { WorkerCanvas } from 'renderers/workerCanvas.js'
 
 export default class Benchmark {
-  constructor (useWorker, useSVG, detail, vectors, reportResults, reportInvalid) {
-    this.useWorker = useWorker
+  constructor (workers, useSVG, detail, vectors, reportResults, reportInvalid) {
+    this.workers = workers
     this.useSVG = useSVG
     this.detail = detail
     this.vectors = vectors
@@ -28,10 +28,8 @@ export default class Benchmark {
     this.view = { latitude: 0, longitude: 0, distance: 3.0 }
     this.useSVG ? this.initSVG() : this.initCanvas()
     this.setupFeatures()
-
     this.animation = new Animation()
-
-    this.renderer = this.choosePathRenderer()
+    this.choosePathRenderer()
 
     // just abandon test on resize
     window.addEventListener('resize', () => {
@@ -43,9 +41,21 @@ export default class Benchmark {
   }
 
   choosePathRenderer() {
-    return this.useSVG ?
-      (this.useWorker ? new WorkerSVG(this) : new WorkerlessSVG(this)) :
-      (this.useWorker ? new WorkerCanvas(this) : new WorkerlessCanvas(this))
+    if (this.workers == 0) {
+      this.renderer = this.useSVG ?
+        new WorkerlessSVG(this) :
+        new WorkerlessCanvas(this)
+    }
+    else {
+      let featureGroups = [['countries', 'rivers', 'lakes']]
+      if (this.workers == 2) {
+        featureGroups = [['countries'], ['rivers', 'lakes']]
+      }
+
+      this.renderer = this.useSVG ?
+        new WorkerSVG(this, featureGroups) :
+        new WorkerCanvas(this, featureGroups)
+    }
   }
 
   setupFeatures () {
@@ -77,7 +87,7 @@ export default class Benchmark {
           'frames': this.animation.frames,
           'mainThreadTime': this.animation.mainThread,
           'method': this.useSVG ? 'svg' : 'canvas',
-          'useWorker': this.useWorker,
+          'workers': this.workers,
           'detail': this.detail
         })
       }

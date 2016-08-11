@@ -24,7 +24,8 @@ body {
 h1 { margin-bottom: 0; }
 p img { height: 1.75rem; }
 a { text-decoration: none; }
-input { vertical-align: 1px }
+
+form { margin-bottom: 2rem; }
 
 fieldset {
   border: none;
@@ -32,11 +33,17 @@ fieldset {
   margin: 0;
 }
 
-label, fieldset>fieldset {
-  display: block;
-  padding: 0;
-  margin: 0.75rem 0 0 0;
+fieldset>fieldset {
+  margin: 1.5rem 0 0 0;
 }
+
+legend {
+  font-weight: bold;
+  padding: 0 0 0.5rem 0;
+}
+
+label { padding: 0 1rem 0 0; }
+input { margin: 0; vertical-align: 1px; }
 
 table {
   border-spacing: 0;

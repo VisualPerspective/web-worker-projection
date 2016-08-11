@@ -26,20 +26,22 @@
   <form id="runBenchmark">
     <fieldset id="fields">
       <fieldset>
+        <legend>Detail</legend>
         <label>
           <input type="radio" name="detail" value="low">
-          Low detail
+          Low
         </label>
         <label>
           <input type="radio" name="detail" value="medium" checked>
-          Medium detail
+          Medium
         </label>
         <label>
           <input type="radio" name="detail" value="high">
-          High detail
+          High
         </label>
       </fieldset>
       <fieldset>
+        <legend>Method</legend>
         <label>
           <input type="radio" name="method" value="svg">
           SVG
@@ -50,10 +52,22 @@
         </label>
       </fieldset>
       <fieldset>
+        <legend>Workers</legend>
         <label>
-          <input type="checkbox" name="useWorker" checked> Use WebWorker for projection
+          <input type="radio" name="workers" value="0">
+          None
         </label>
-        <p><button id="go">Run Test</button></p>
+        <label>
+          <input type="radio" name="workers" value="1" checked>
+          One
+        </label>
+        <label>
+          <input type="radio" name="workers" value="2">
+          Two
+        </label>
+     </fieldset>
+      <fieldset>
+        <button id="go">Run Test</button>
       </fieldset>
     </fieldset>
   </form>
@@ -67,7 +81,7 @@
     <tr>
       <th>Detail</th>
       <th>Method</th>
-      <th>Worker</th>
+      <th>Workers</th>
       <th class="number">FPS</th>
       <th class="number">Render Time *</th>
     </tr>

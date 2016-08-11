@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { geoPath } from 'd3'
 import { satellite } from 'satellite.js'
 import { PathWriter } from 'canvasProxy.js'
@@ -38,15 +39,17 @@ let fns = {
 
       path.context(proxy)
 
-      for (let i = 0; i < vectors.length; i++) {
-        path(vectors[i])
+      let results = _.map(vectors, (vector) => {
+        path(vector.data)
         proxy.markEndOfPath()
-      }
+        return vector.name
+      })
 
       postMessage(['pathsProjected', {
           commandBuffer: proxy.commandArray.buffer,
           argumentBuffer: proxy.argumentArray.buffer,
-          endOfPaths: proxy.endOfPaths
+          endOfPaths: proxy.endOfPaths,
+          paths: results
         }],
         [proxy.commandArray.buffer, proxy.argumentArray.buffer]
       )

@@ -1,7 +1,8 @@
+import _ from 'lodash'
 import { PathReader } from 'canvasProxy.js'
 
 export class WorkerClient {
-  constructor (world) {
+  constructor (world, features) {
     this.world = world
 
     if (!this.useSVG) {
@@ -20,11 +21,9 @@ export class WorkerClient {
     }
 
     this.worker.postMessage(['setup', {
-      vectors: [
-        this.world.features['countries'],
-        this.world.features['rivers'],
-        this.world.features['lakes']
-      ],
+      vectors: _.map(features, (name) => {
+        return { 'name': name, data: this.world.features[name] }
+      }),
       distance: this.world.view.distance,
       width: this.world.width,
       height: this.world.height,
@@ -34,11 +33,9 @@ export class WorkerClient {
 
   pathsProjected (options) {
     this.projecting = false
+    this.projectedPaths = options.paths
 
-    if (this.world.useSVG) {
-      this.projectedPaths = options.paths
-    }
-    else {
+    if (!this.world.useSVG) {
       this.pathReader.back = this.pathReader.front
       this.pathReader.front = new PathReader(
         options.commandBuffer,

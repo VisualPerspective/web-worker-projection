@@ -1,3 +1,5 @@
+import { createWorker } from 'workerClient.js'
+
 export function renderPaths (world) {
   if (!world.workerProjecting) {
     world.animation.frames++

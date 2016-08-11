@@ -19,15 +19,15 @@ export class WorkerlessCanvas {
     this.world.path({ type: 'Sphere' })
     ctx.fill()
     ctx.lineWidth = 1.0
-    ctx.strokeStyle = '#457'
+    ctx.strokeStyle = '#78a'
     ctx.stroke()
 
     ctx.beginPath()
     this.world.path(this.world.features['countries'])
     ctx.fillStyle = '#eee'
     ctx.fill()
-    ctx.lineWidth = 1.0
-    ctx.strokeStyle = '#457'
+    ctx.lineWidth = 0.5
+    ctx.strokeStyle = '#78a'
     ctx.stroke()
 
     ctx.beginPath()

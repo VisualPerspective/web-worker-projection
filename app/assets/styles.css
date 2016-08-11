@@ -75,7 +75,7 @@ canvas, svg {
   width: 100%;
 }
 
-.countries { fill: #eee; stroke: #fff; stroke-width: 1px; }
-.rivers { fill: none; stroke: #88f; stroke-width: 0.5px }
-.lakes { fill: #88f; }
+.countries { fill: #eee; stroke: #78a; stroke-width: 0.5px; }
+.rivers { fill: none; stroke: #78a; stroke-width: 0.5px }
+.lakes { fill: #78a; }
 .globe { fill: #78a; }

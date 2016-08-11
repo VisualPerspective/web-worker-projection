@@ -41,8 +41,8 @@ export class WorkerCanvas {
     ctx.beginPath()
     this.world.path({ type: 'Sphere' })
     ctx.fill()
-    ctx.lineWidth = 1.0
-    ctx.strokeStyle = '#457'
+    ctx.lineWidth = 0.5
+    ctx.strokeStyle = '#78a'
     ctx.stroke()
   }
 
@@ -52,8 +52,8 @@ export class WorkerCanvas {
     pathReader.front.renderPath(ctx)
     ctx.fillStyle = '#eee'
     ctx.fill()
-    ctx.lineWidth = 1.0
-    ctx.strokeStyle = '#457'
+    ctx.lineWidth = 0.5
+    ctx.strokeStyle = '#78a'
     ctx.stroke()
   }
 

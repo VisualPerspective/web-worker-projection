@@ -22,8 +22,17 @@ body {
 }
 
 h1 { margin-bottom: 0; }
-p img { height: 1.75rem; }
-a { text-decoration: none; }
+
+a img {
+  height: 1.25rem;
+  vertical-align: bottom;
+}
+
+a, a:active, a:visited {
+  color: #444;
+  font-weight: bold;
+  padding-right: 1rem;
+}
 
 form { margin-bottom: 2rem; }
 

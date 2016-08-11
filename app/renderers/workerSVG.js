@@ -1,19 +1,30 @@
+import _ from 'lodash'
 import { WorkerClient } from 'workerClient.js'
 
 export class WorkerSVG {
-  constructor (world) {
+  constructor (world, featureGroups) {
     this.world = world
-    this.workerClient = new WorkerClient(this.world)
+    this.featureGroups = featureGroups
+    this.workerClients = _.map(this.featureGroups, (group) => {
+      return new WorkerClient(this.world, group)
+    })
   }
 
   renderPaths () {
-    if (!this.workerClient.projecting) {
+    if (!_.some(this.workerClients, 'projecting')) {
       this.world.animation.frames++
-      this.workerClient.requestSVGPaths()
+      _.each(this.workerClients, (client) => { client.requestSVGPaths() })
 
-      if (this.workerClient.projectedPaths) {
-        this.world.featureNames.forEach((name, i) => {
-          this.world.paths[name].attr('d', this.workerClient.projectedPaths[i])
+      if (_.every(this.workerClients, 'projectedPaths')) {
+        let projectedPaths = {}
+        _.each(this.workerClients, (client) => {
+          _.each(client.projectedPaths, (path) => {
+            projectedPaths[path.name] = path.data
+          })
+        })
+
+        _.each(this.world.featureNames, (name) => {
+          this.world.paths[name].attr('d', projectedPaths[name])
         })
       }
 

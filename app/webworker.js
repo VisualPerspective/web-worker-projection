@@ -24,10 +24,9 @@ let fns = {
     projection.rotate(options.rotate)
 
     if (useSVG) {
-      var results = []
-      for (let i = 0; i < vectors.length; i++) {
-        results.push(path(vectors[i]))
-      }
+      let results = _.map(vectors, (vector) => {
+        return { 'name': vector.name, 'data': path(vector.data) }
+      })
 
       postMessage(['pathsProjected', { paths: results }])
     }

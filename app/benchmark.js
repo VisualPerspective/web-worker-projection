@@ -79,9 +79,11 @@ export default class Benchmark {
     },
     (totalElapsed) => {
       if (this.invalid) {
+        this.renderer.terminate()
         this.reportInvalid()
       }
       else if (totalElapsed > 5000) {
+        this.renderer.terminate()
         this.reportResults({
           'totalTime': totalElapsed,
           'frames': this.animation.frames,

@@ -73,4 +73,10 @@ export class WorkerCanvas {
     ctx.strokeStyle = '#78a'
     ctx.stroke()
   }
+
+  terminate() {
+    _.each(this.workerClients, (client) => {
+      client.worker.terminate()
+    })
+  }
 }

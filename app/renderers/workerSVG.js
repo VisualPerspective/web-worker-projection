@@ -34,4 +34,10 @@ export class WorkerSVG {
       setTimeout(() => { this.world.render() }, 1)
     }
   }
+
+  terminate() {
+    _.each(this.workerClients, (client) => {
+      client.worker.terminate()
+    })
+  }
 }

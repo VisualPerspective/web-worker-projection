@@ -14,4 +14,6 @@ export class WorkerlessSVG {
       this.world.render()
     })
   }
+
+  terminate() {}
 }

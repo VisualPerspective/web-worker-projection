@@ -43,4 +43,6 @@ export class WorkerlessCanvas {
 
     window.requestAnimationFrame(() => { this.world.render() })
   }
+
+  terminate() {}
 }

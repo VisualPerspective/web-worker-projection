@@ -1,30 +1,35 @@
 import { select, selectAll, geoJson, geoPath } from 'd3'
 import { feature } from 'topojson'
 import { satellite } from 'satellite.js'
-import { createWorker } from 'workerClient.js'
 
 import { PathReader } from 'canvasProxy.js'
 import { Animation } from 'animation.js'
 
-import * as WorkerlessSVG from 'renderers/workerlessSVG.js'
-import * as WorkerSVG from 'renderers/workerSVG.js'
-import * as WorkerlessCanvas from 'renderers/workerlessCanvas.js'
-import * as WorkerCanvas from 'renderers/workerCanvas.js'
+import { WorkerlessSVG } from 'renderers/workerlessSVG.js'
+import { WorkerSVG } from 'renderers/workerSVG.js'
+import { WorkerlessCanvas } from 'renderers/workerlessCanvas.js'
+import { WorkerCanvas } from 'renderers/workerCanvas.js'
 
 export default class Benchmark {
-  constructor (useWorker, useSVG, detail, vectors, reportResults, reportInvalid) {
+  constructor (workers, useSVG, detail, vectors, reportResults, reportInvalid) {
+    this.workers = workers
     this.useSVG = useSVG
-    this.useWorker = useWorker
     this.detail = detail
     this.vectors = vectors
     this.reportResults = reportResults
     this.reportInvalid = reportInvalid
 
-    this.view = { latitude: 0, longitude: 0, distance: 3.0 }
-    this.animation = new Animation()
+    this.featureNames = ['countries', 'rivers', 'lakes']
+    this.features = {}
+    this.paths = {}
+    this.pathReader
+    this.projectedPaths
 
+    this.view = { latitude: 0, longitude: 0, distance: 3.0 }
     this.useSVG ? this.initSVG() : this.initCanvas()
-    this.renderPaths = this.choosePathRenderer().renderPaths
+    this.setupFeatures()
+    this.animation = new Animation()
+    this.choosePathRenderer()
 
     // just abandon test on resize
     window.addEventListener('resize', () => {
@@ -32,22 +37,25 @@ export default class Benchmark {
       this.invalid = true
     })
 
-    this.featureNames = ['countries', 'rivers', 'lakes']
-    this.features = {}
-    this.paths = {}
-    this.pathReader
-    this.projectedPaths
-    this.workerProjecting = false
-
-    this.setupFeatures()
-    if (this.useWorker) { this.worker = createWorker(this) }
     this.render()
   }
 
   choosePathRenderer() {
-    return this.useSVG ?
-      (this.useWorker ? WorkerSVG : WorkerlessSVG) :
-      (this.useWorker ? WorkerCanvas : WorkerlessCanvas)
+    if (this.workers == 0) {
+      this.renderer = this.useSVG ?
+        new WorkerlessSVG(this) :
+        new WorkerlessCanvas(this)
+    }
+    else {
+      let featureGroups = [['countries', 'rivers', 'lakes']]
+      if (this.workers == 2) {
+        featureGroups = [['countries'], ['rivers', 'lakes']]
+      }
+
+      this.renderer = this.useSVG ?
+        new WorkerSVG(this, featureGroups) :
+        new WorkerCanvas(this, featureGroups)
+    }
   }
 
   setupFeatures () {
@@ -79,12 +87,12 @@ export default class Benchmark {
           'frames': this.animation.frames,
           'mainThreadTime': this.animation.mainThread,
           'method': this.useSVG ? 'svg' : 'canvas',
-          'useWorker': this.useWorker,
+          'workers': this.workers,
           'detail': this.detail
         })
       }
       else {
-        this.renderPaths(this)
+        this.renderer.renderPaths(this)
       }
     })
   }

@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', function () {
   form.addEventListener('submit', function (e) {
     e.preventDefault()
     benchmark(
-      this.elements['useWorker'].checked,
+      parseInt(document.querySelector('input[name="workers"]:checked').value, 10),
       document.querySelector('input[name="method"]:checked').value == 'svg',
       document.querySelector('input[name="detail"]:checked').value
     )
@@ -28,7 +28,7 @@ function reportResults (results) {
   document.getElementById('results').innerHTML += '<tr>' +
     '<td>' + results.detail + '</td>' +
     '<td>' + results.method + '</td>' +
-    '<td>' + results.useWorker + '</td>' +
+    '<td>' + results.workers + '</td>' +
     '<td class="number">' + fps.toFixed(1) + '</td>' +
     '<td class="number">' + mainThreadUtilization.toFixed(1) + '%</td>' +
   '</tr>'
@@ -36,10 +36,10 @@ function reportResults (results) {
   document.querySelector('fieldset').disabled = false
 }
 
-function benchmark (useWorker, useSVG, detail) {
+function benchmark (workers, useSVG, detail) {
   json("data/vectors-" + detail + ".json", function (error, vectors) {
      new Benchmark(
-      useWorker, useSVG, detail, vectors,
+      workers, useSVG, detail, vectors,
       reportResults, reportInvalid
     )
   })

@@ -29,6 +29,9 @@ a img {
 }
 
 a, a:active, a:visited {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  margin-top: 0.5rem;
   color: #444;
   font-weight: bold;
   padding-right: 1rem;

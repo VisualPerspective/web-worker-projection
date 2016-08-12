@@ -85,7 +85,11 @@ export default class Benchmark {
       this.view.longitude += elapsed / 20
     },
     (totalElapsed) => {
-      if (totalElapsed > 5000) {
+      if (this.oneFrame && this.animation.frames > 0) {
+        this.renderer.terminate()
+        this.reportResults()
+      }
+      else if (totalElapsed > 5000) {
         this.renderer.terminate()
         this.reportResults({
           'totalTime': totalElapsed,

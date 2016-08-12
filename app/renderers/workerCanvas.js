@@ -18,11 +18,12 @@ export class WorkerCanvas {
 
   renderPaths () {
     if (!_.some(this.workerClients, 'projecting')) {
-      this.world.animation.frames++
-      this.world.handleResize()
       _.each(this.workerClients, (client) => { client.requestCanvasPaths() })
 
       if (_.every(this.workerClients, 'projectedPaths')) {
+        this.world.animation.frames++
+        this.world.handleResize()
+
         let ctx = this.world.ctx
         ctx.clearRect(0, 0, this.world.width, this.world.height)
 	this.globe()

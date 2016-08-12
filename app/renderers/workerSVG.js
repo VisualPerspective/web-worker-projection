@@ -13,6 +13,9 @@ export class WorkerSVG {
   renderPaths () {
     if (!_.some(this.workerClients, 'projecting')) {
       this.world.animation.frames++
+      this.world.handleResize()
+      this.world.sphere.attr('d', this.world.path)
+
       _.each(this.workerClients, (client) => { client.requestSVGPaths() })
 
       if (_.every(this.workerClients, 'projectedPaths')) {

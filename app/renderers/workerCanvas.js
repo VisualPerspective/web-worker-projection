@@ -14,6 +14,7 @@ export class WorkerCanvas {
   renderPaths () {
     if (!_.some(this.workerClients, 'projecting')) {
       this.world.animation.frames++
+      this.world.handleResize()
       _.each(this.workerClients, (client) => { client.requestCanvasPaths() })
 
       if (_.every(this.workerClients, 'projectedPaths')) {

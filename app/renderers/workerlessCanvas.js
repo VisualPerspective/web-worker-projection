@@ -5,12 +5,7 @@ export class WorkerlessCanvas {
 
   renderPaths () {
     this.world.animation.frames++
-    this.world.projection.rotate([
-      this.world.view.longitude,
-      this.world.view.latitude,
-      0
-    ])
-
+    this.world.handleResize()
     let ctx = this.world.ctx
     ctx.clearRect(0, 0, this.world.width, this.world.height)
 

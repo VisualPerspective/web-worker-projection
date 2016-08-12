@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { geoPath } from 'd3'
-import { satellite } from 'satellite.js'
+import { satellite, updateSatellite } from 'satellite.js'
 import { PathWriter } from 'canvasProxy.js'
 
 let vectors, path, projection, useSVG
@@ -10,18 +10,17 @@ let fns = {
   'setup': function (options) {
     vectors = options.vectors
     useSVG = options.useSVG
-
-    projection = satellite(
-      options.distance,
-      options.width,
-      options.height
-    )
-
+    projection = satellite(options.distance)
     path = geoPath().projection(projection)
   },
 
   'projectPaths': function (options) {
-    projection.rotate(options.rotate)
+    updateSatellite(
+      projection,
+      options.width,
+      options.height,
+      options.rotate
+    )
 
     if (useSVG) {
       let results = _.map(vectors, (vector) => {

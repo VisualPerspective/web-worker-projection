@@ -5,7 +5,9 @@ export class WorkerlessSVG {
 
   renderPaths () {
     this.world.animation.frames++
-    this.world.projection.rotate([this.world.view.longitude, this.world.view.latitude, 0])
+    this.world.handleResize()
+    this.world.sphere.attr('d', this.world.path)
+
     this.world.featureNames.forEach((name) => {
         this.world.paths[name].attr('d', this.world.path)
     })

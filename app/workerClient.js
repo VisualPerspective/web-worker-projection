@@ -25,8 +25,6 @@ export class WorkerClient {
         return { 'name': name, data: this.world.features[name] }
       }),
       distance: this.world.view.distance,
-      width: this.world.width,
-      height: this.world.height,
       useSVG: this.world.useSVG
     }])
   }
@@ -49,9 +47,11 @@ export class WorkerClient {
     this.projecting = true
 
     this.worker.postMessage(['projectPaths', {
-      'rotate': [this.world.view.longitude, this.world.view.latitude, 0],
-      'commandBuffer': this.pathReader.back.commandArray.buffer,
-      'argumentBuffer': this.pathReader.back.argumentArray.buffer
+      width: this.world.width,
+      height: this.world.height,
+      rotate: [this.world.view.longitude, this.world.view.latitude, 0],
+      commandBuffer: this.pathReader.back.commandArray.buffer,
+      argumentBuffer: this.pathReader.back.argumentArray.buffer
     }], [
       this.pathReader.back.commandArray.buffer,
       this.pathReader.back.argumentArray.buffer
@@ -62,7 +62,9 @@ export class WorkerClient {
     this.projecting = true
 
     this.worker.postMessage(['projectPaths', {
-      'rotate': [this.world.view.longitude, this.world.view.latitude, 0]
+      width: this.world.width,
+      height: this.world.height,
+      rotate: [this.world.view.longitude, this.world.view.latitude, 0]
     }])
   }
 }

@@ -60,6 +60,7 @@ export class PathReader {
     let endOfPath = this.endOfPaths.shift()
     while (this.commandIndex <= endOfPath) {
       let command = this.commandArray[this.commandIndex++]
+
       switch (command) {
         case MOVE_TO:
           ctx.moveTo(

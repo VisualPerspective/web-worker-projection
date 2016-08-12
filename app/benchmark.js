@@ -1,6 +1,7 @@
+import _ from 'lodash'
 import { select, selectAll, geoJson, geoPath } from 'd3'
 import { feature } from 'topojson'
-import { satellite } from 'satellite.js'
+import { satellite, updateSatellite } from 'satellite.js'
 
 import { PathReader } from 'canvasProxy.js'
 import { Animation } from 'animation.js'
@@ -11,13 +12,13 @@ import { WorkerlessCanvas } from 'renderers/workerlessCanvas.js'
 import { WorkerCanvas } from 'renderers/workerCanvas.js'
 
 export default class Benchmark {
-  constructor (workers, useSVG, detail, vectors, reportResults, reportInvalid) {
+  constructor (workers, useSVG, detail, vectors, reportResults, oneFrame) {
     this.workers = workers
     this.useSVG = useSVG
     this.detail = detail
     this.vectors = vectors
     this.reportResults = reportResults
-    this.reportInvalid = reportInvalid
+    this.oneFrame = oneFrame
 
     this.featureNames = ['countries', 'rivers', 'lakes']
     this.features = {}
@@ -25,18 +26,14 @@ export default class Benchmark {
     this.pathReader
     this.projectedPaths
 
+    this.needsResize = true
+    window.addEventListener('resize', () => { this.needsResize = true })
+
     this.view = { latitude: 0, longitude: 0, distance: 3.0 }
     this.useSVG ? this.initSVG() : this.initCanvas()
     this.setupFeatures()
     this.animation = new Animation()
     this.choosePathRenderer()
-
-    // just abandon test on resize
-    window.addEventListener('resize', () => {
-      document.querySelector('canvas, svg').style.display = 'none'
-      this.invalid = true
-    })
-
     this.render()
   }
 
@@ -73,16 +70,19 @@ export default class Benchmark {
     })
   }
 
+  handleResize () {
+    if (this.needsResize) {
+      this.needsResize = false
+      this.useSVG ? this.resizeSVG() : this.resizeCanvas()
+    }
+  }
+
   render () {
     this.animation.tick((elapsed) => {
       this.view.longitude += elapsed / 20
     },
     (totalElapsed) => {
-      if (this.invalid) {
-        this.renderer.terminate()
-        this.reportInvalid()
-      }
-      else if (totalElapsed > 5000) {
+      if (totalElapsed > 5000) {
         this.renderer.terminate()
         this.reportResults({
           'totalTime': totalElapsed,
@@ -94,6 +94,13 @@ export default class Benchmark {
         })
       }
       else {
+        updateSatellite(
+          this.projection,
+          this.width,
+          this.height,
+          [this.view.longitude, this.view.latitude, 0]
+        )
+
         this.renderer.renderPaths(this)
       }
     })
@@ -104,17 +111,21 @@ export default class Benchmark {
     selectAll('canvas').remove()
 
     this.svg = select('.right').append('svg')
-    this.width = this.height = this.svg.node().getBoundingClientRect().width
+    this.projection = satellite(this.view.distance)
+    this.path = geoPath().projection(this.projection)
+    this.sphere = this.svg.append('path')
+      .datum({ type: 'Sphere' })
+      .attr('class', 'globe')
+  }
+
+  resizeSVG() {
+    this.width = this.height = Math.floor(
+      this.svg.node().getBoundingClientRect().width
+    )
 
     this.svg.style('height', this.height + 'px')
       .attr('width', this.width)
       .attr('height', this.height)
-
-    this.projection = satellite(this.view.distance, this.width, this.height)
-    this.path = geoPath().projection(this.projection)
-
-    this.svg.append('path').datum({ type: 'Sphere' })
-      .attr('class', 'globe').attr('d', this.path)
   }
 
   initCanvas() {
@@ -122,19 +133,22 @@ export default class Benchmark {
     selectAll('canvas').remove()
 
     this.canvas = select('.right').append('canvas')
+    this.ctx = this.canvas.node().getContext('2d')
+    this.projection = satellite(this.view.distance)
+    this.path = geoPath().projection(this.projection).context(this.ctx)
+  }
+
+  resizeCanvas() {
     let devicePixelRatio = window.devicePixelRatio || 1
 
-    this.width = this.height =
+    this.width = this.height = Math.floor(
       this.canvas.node().getBoundingClientRect().width *
       devicePixelRatio
+    )
 
     this.canvas.style('height', (this.height / devicePixelRatio) + 'px')
       .attr('width', this.width)
       .attr('height', this.height)
-
-    this.ctx = this.canvas.node().getContext('2d')
-    this.projection = satellite(this.view.distance, this.width, this.height)
-    this.path = geoPath().projection(this.projection).context(this.ctx)
   }
 }
 

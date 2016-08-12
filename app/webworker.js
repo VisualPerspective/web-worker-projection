@@ -12,6 +12,8 @@ let fns = {
     useSVG = options.useSVG
     projection = satellite(options.distance)
     path = geoPath().projection(projection)
+
+    postMessage(['setupComplete', {}])
   },
 
   'projectPaths': function (options) {

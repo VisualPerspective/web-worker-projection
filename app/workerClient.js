@@ -4,6 +4,9 @@ import { PathReader } from 'canvasProxy.js'
 export class WorkerClient {
   constructor (world, features) {
     this.world = world
+    this.ready = new Promise((resolve) => {
+      this.setupCompleteResolver = resolve
+    })
 
     if (!this.useSVG) {
       this.pathReader = {
@@ -22,11 +25,15 @@ export class WorkerClient {
 
     this.worker.postMessage(['setup', {
       vectors: _.map(features, (name) => {
-        return { 'name': name, data: this.world.features[name] }
+        return { name: name, data: this.world.features[name] }
       }),
       distance: this.world.view.distance,
       useSVG: this.world.useSVG
     }])
+  }
+
+  setupComplete () {
+    this.setupCompleteResolver()
   }
 
   pathsProjected (options) {

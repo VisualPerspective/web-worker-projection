@@ -1,6 +1,7 @@
 export class WorkerlessSVG {
   constructor (world) {
     this.world = world
+    this.ready = Promise.resolve()
   }
 
   renderPaths () {

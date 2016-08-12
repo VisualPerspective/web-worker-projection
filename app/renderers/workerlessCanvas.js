@@ -1,6 +1,7 @@
 export class WorkerlessCanvas {
   constructor (world) {
     this.world = world
+    this.ready = Promise.resolve()
   }
 
   renderPaths () {

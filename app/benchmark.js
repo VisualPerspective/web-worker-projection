@@ -31,10 +31,10 @@ export default class Benchmark {
 
     this.view = { latitude: 0, longitude: 0, distance: 3.0 }
     this.useSVG ? this.initSVG() : this.initCanvas()
+    this.useSVG ? this.resizeSVG() : this.resizeCanvas()
     this.setupFeatures()
     this.animation = new Animation()
     this.choosePathRenderer()
-    this.render()
   }
 
   choosePathRenderer() {
@@ -53,6 +53,10 @@ export default class Benchmark {
         new WorkerSVG(this, featureGroups) :
         new WorkerCanvas(this, featureGroups)
     }
+
+    this.renderer.ready.then(() => {
+      this.render()
+    })
   }
 
   setupFeatures () {
@@ -64,7 +68,6 @@ export default class Benchmark {
       if (this.useSVG) {
         this.paths[name] = this.svg.append('path')
           .datum(this.features[name])
-          .attr('d', this.path)
           .attr('class', name)
       }
     })

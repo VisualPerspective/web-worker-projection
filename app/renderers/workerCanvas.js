@@ -9,6 +9,11 @@ export class WorkerCanvas {
     this.workerClients = _.map(this.featureGroups, (group) => {
       return new WorkerClient(this.world, group)
     })
+
+    this.ready = new Promise((resolve) => { this.readyResolver = resolve })
+    Promise.all(_.map(this.workerClients, 'ready')).then(() => {
+      this.readyResolver()
+    })
   }
 
   renderPaths () {

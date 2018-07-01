@@ -1,6 +1,6 @@
 # WebWorker Geo Projection Test
 
-[![Test](/demo.png?raw=true =100x)](http://k9.github.com/web-worker-projection/)
+[![Test](/demo.png?raw=true)](http://k9.github.com/web-worker-projection/)
 [Test](http://k9.github.io/web-worker-projection) of D3 projection in a WebWorker.
 
 While working on a [WebGL Globe Viewer](http://k9.github.io/globe-viewer)

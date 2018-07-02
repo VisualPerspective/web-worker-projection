@@ -9,18 +9,22 @@
   },
   "scripts": {
     "start": "brunch watch --server",
-    "prod": "brunch build --production"
+    "build": "brunch build --production",
+    "make-vectors": "bash scripts/make-vectors.sh"
   },
   "dependencies": {
     "babel-plugin-transform-es2015-for-of": "^6.8.0",
     "babel-plugin-transform-object-assign": "^6.8.0",
-    "d3": "^4.2.1",
-    "topojson": "^1.6.26"
+    "d3": "^5.5.0",
+    "d3-geo-projection": "^2.4.0",
+    "ndjson-cli": "^0.3.1",
+    "shapefile": "^0.6.6",
+    "topojson": "^3.0.2"
   },
   "devDependencies": {
     "auto-reload-brunch": "^2.0.0",
-    "babel-brunch": "~6.0.0",
-    "babel-preset-es2015": "~6.3.13",
+    "babel-brunch": "~6.1.1",
+    "babel-preset-es2015": "~6.24.1",
     "brunch": "^2.4.0",
     "clean-css-brunch": "^2.0.0",
     "css-brunch": "^2.0.0",

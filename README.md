@@ -32,5 +32,13 @@ Positives:
 * FPS on phones is significantly better
 
 Negatives:
-* Firefox doesn't perform well due to https://bugzilla.mozilla.org/show_bug.cgi?id=1240984
 * Overall the code becomes more complex
+
+To install, you'll need yarn and a recent version of Node. Run:
+```
+yarn
+yarn make-vectors
+yarn start
+```
+
+The benchmark should now be available at `http://localhost:3333`

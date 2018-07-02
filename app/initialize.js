@@ -27,7 +27,6 @@ window.addEventListener('resize', function () {
 })
 
 function runBenchmark (oneFrame, forceNoWorkers) {
-  console.log(oneFrame)
   benchmarking = true
   var form = document.getElementById('runBenchmark')
   benchmark(
@@ -58,7 +57,7 @@ function reportResults (results) {
 }
 
 function benchmark (workers, useSVG, detail, oneFrame) {
-  json("data/vectors-" + detail + ".json", function (error, vectors) {
+  json("data/vectors-" + detail + ".json").then(vectors => {
      new Benchmark(workers, useSVG, detail, vectors, reportResults, oneFrame)
   })
 }
